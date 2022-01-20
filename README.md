@@ -1,18 +1,15 @@
-# MySQL Schema Diff Action
+# MySQL Schema Artifact Action
 
-This action is used to check if 2 databases have the same schemas.
+This action is used to create a SQL Dump file with no exteraneous data except the raw table structures
 This can be used to check if a stage and production database have the same schemas before merging code.
 
 ```
 inputs:
-  hostname1
-  username1
-  password1
-  database1
-  hostname2
-  username2
-  password2
-  database2
+  hostname: The host name to connect to the database
+  username: The username to connect to the database
+  password: The password to connect to the database
+  database: The name of the database to dump
+  file: The name of the file that will be dumped, and used as the artifact.
 ```
 
 ## Example
