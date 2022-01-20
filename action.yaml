@@ -38,7 +38,7 @@ inputs:
     description: 'The database name of the first mysql connection'
     required: true
   file2:
-    description: 'The name of the second SQL Dump file"
+    description: 'The name of the second SQL Dump file'
     default: 'db2.sql'
     required: true
 runs:
