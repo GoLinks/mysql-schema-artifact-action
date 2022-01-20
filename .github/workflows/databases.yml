@@ -39,6 +39,8 @@ jobs:
       - name: Check MySQL schemas
         uses: ./
         with: 
+          file1: db1.sql
+          file2: db2.sql
           hostname1: ${{ secrets.HOSTNAME1 }}
           username1: ${{ secrets.USERNAME1 }}
           password1: ${{ secrets.PASSWORD1 }}
@@ -47,3 +49,11 @@ jobs:
           username2: ${{ secrets.USERNAME2 }}
           password2: ${{ secrets.PASSWORD2 }}
           database2: ${{ secrets.DATABASE2 }}
+      - uses: actions/upload-artifact@v2
+        with:
+          name: db1.sql
+          path: ./db1.sql
+      - uses: actions/upload-artifact@v2
+        with:
+          name: db1.sql
+          path: ./db1.sql
