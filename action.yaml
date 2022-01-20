@@ -1,4 +1,4 @@
-name: mysql-schema-diff
+name: mysql-schema-artifact
 author: Sean Burke
 description: Check to see if the MySQL schemas for 2 DBs are the same
 branding:
