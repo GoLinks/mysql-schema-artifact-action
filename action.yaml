@@ -19,6 +19,10 @@ inputs:
   database1:
     description: 'The database name of the first mysql connection'
     required: true
+  file1: 
+    description: 'The name of the first SQL Dump file'
+    default: 'db1.sql'
+    required: true
   hostname2:
     description: 'The host of the second mysql connection'
     required: false
@@ -33,6 +37,10 @@ inputs:
   database2:
     description: 'The database name of the first mysql connection'
     required: true
+  file2:
+    description: 'The name of the second SQL Dump file'
+    default: 'db2.sql'
+    required: true
 runs:
   using: "composite"
   steps:
@@ -44,25 +52,20 @@ runs:
         pwd1=${{ inputs.password1 }};
         db1=${{ inputs.database1 }};
         echo "Connecting to DB1"
-        mysqldump --defaults-extra-file=<(printf '[client]\nuser = %s\npassword = %s\nhost = %s' $user1 $pwd1 $host1) -d --skip-add-drop-table --skip-add-drop-database --single-transaction $db1 | sed -e 's/AUTO_INCREMENT=[[:digit:]]* //' | sed -e 's/Host: .*  //' | sed -e 's/-- Dump completed on .*//' > db1.sql
+        mysqldump --defaults-extra-file=<(printf '[client]\nuser = %s\npassword = %s\nhost = %s' $user1 $pwd1 $host1) -d --skip-add-drop-table --skip-add-drop-database --single-transaction $db1 | sed -e 's/AUTO_INCREMENT=[[:digit:]]* //' | sed -e 's/Host: .*  //' | sed -e 's/-- Dump completed on .*//' > ${{ inputs.file1 }}
         if [[ $? -ne 0 ]]; then
             echo >&2 "SQL error"
             exit 1
         fi
-        echo "db1.sql created"
+        echo "${{ inputs.file1 }} created"
         # Use details to connect to dev and mysqldump the tables without data
         user2=${{ inputs.username2 }}
         host2=${{ inputs.hostname2 }}
         pwd2=${{ inputs.password2 }}
         db2=${{ inputs.database2 }}
         echo "Connecting to DB2"
-        mysqldump --defaults-extra-file=<(printf '[client]\nuser = %s\npassword = %s\nhost = %s' $user2 $pwd2 $host2) -d --skip-add-drop-table --skip-add-drop-database --single-transaction $db2 | sed -e 's/AUTO_INCREMENT=[[:digit:]]* //' | sed -e 's/Host: .*  //' | sed -e 's/-- Dump completed on .*//' > db2.sql
-        if [[ $? -ne 0 ]]; then
-            echo >&2 "SQL error"
-            exit 1
-        fi
-        echo "Checking for differences"
-        diff db1.sql db2.sql
+        mysqldump --defaults-extra-file=<(printf '[client]\nuser = %s\npassword = %s\nhost = %s' $user2 $pwd2 $host2) -d --skip-add-drop-table --skip-add-drop-database --single-transaction $db2 | sed -e 's/AUTO_INCREMENT=[[:digit:]]* //' | sed -e 's/Host: .*  //' | sed -e 's/-- Dump completed on .*//' > ${{ inputs.file2 }}
+        echo "${{ inputs.file2 }} created"
         echo "Completed"
 
   
