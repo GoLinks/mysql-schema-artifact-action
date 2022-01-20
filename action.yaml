@@ -5,41 +5,23 @@ branding:
   icon: 'database'
   color: 'purple'
 inputs:
-  hostname1:
+  hostname:
     description: 'The host of the first mysql connection'
     required: false
     default: 'localhost'
-  username1:
+  username:
     description: 'The username of the first mysql connection'
     required: true
-  password1:
+  password:
     description: 'The password of the first mysql connection'
     required: false
     default: ''
-  database1:
+  database:
     description: 'The database name of the first mysql connection'
     required: true
-  file1: 
+  file: 
     description: 'The name of the first SQL Dump file'
-    default: 'db1.sql'
-    required: true
-  hostname2:
-    description: 'The host of the second mysql connection'
-    required: false
-    default: 'localhost'
-  username2:
-    description: 'The username of the second mysql connection'
-    required: true
-  password2:
-    description: 'The password of the second mysql connection'
-    required: false
-    default: ''
-  database2:
-    description: 'The database name of the first mysql connection'
-    required: true
-  file2:
-    description: 'The name of the second SQL Dump file'
-    default: 'db2.sql'
+    default: 'db.sql'
     required: true
 runs:
   using: "composite"
@@ -47,25 +29,17 @@ runs:
     - name: MySQL Diff
       shell: bash
       run: |
-        user1=${{ inputs.username1 }};
-        host1=${{ inputs.hostname1 }};
-        pwd1=${{ inputs.password1 }};
-        db1=${{ inputs.database1 }};
-        echo "Connecting to DB1"
-        mysqldump --defaults-extra-file=<(printf '[client]\nuser = %s\npassword = %s\nhost = %s' $user1 $pwd1 $host1) -d --skip-add-drop-table --skip-add-drop-database --single-transaction $db1 | sed -e 's/AUTO_INCREMENT=[[:digit:]]* //' | sed -e 's/Host: .*  //' | sed -e 's/-- Dump completed on .*//' > ${{ inputs.file1 }}
+        user=${{ inputs.username }};
+        host=${{ inputs.hostname }};
+        pwd=${{ inputs.password }};
+        db=${{ inputs.database }};
+        echo "Connecting to DB"
+        mysqldump --defaults-extra-file=<(printf '[client]\nuser = %s\npassword = %s\nhost = %s' $user $pwd $host) -d --skip-add-drop-table --skip-add-drop-database --single-transaction $db | sed -e 's/AUTO_INCREMENT=[[:digit:]]* //' | sed -e 's/Host: .*  //' | sed -e 's/-- Dump completed on .*//' > ${{ inputs.file }}
         if [[ $? -ne 0 ]]; then
             echo >&2 "SQL error"
             exit 1
         fi
-        echo "${{ inputs.file1 }} created"
-        # Use details to connect to dev and mysqldump the tables without data
-        user2=${{ inputs.username2 }}
-        host2=${{ inputs.hostname2 }}
-        pwd2=${{ inputs.password2 }}
-        db2=${{ inputs.database2 }}
-        echo "Connecting to DB2"
-        mysqldump --defaults-extra-file=<(printf '[client]\nuser = %s\npassword = %s\nhost = %s' $user2 $pwd2 $host2) -d --skip-add-drop-table --skip-add-drop-database --single-transaction $db2 | sed -e 's/AUTO_INCREMENT=[[:digit:]]* //' | sed -e 's/Host: .*  //' | sed -e 's/-- Dump completed on .*//' > ${{ inputs.file2 }}
-        echo "${{ inputs.file2 }} created"
+        echo "${{ inputs.file }} created"
         echo "Completed"
 
   
