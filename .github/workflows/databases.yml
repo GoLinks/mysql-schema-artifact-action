@@ -1,5 +1,4 @@
 # This is a basic workflow to help you get started with Actions
-
 name: Check Databases
 
 # Controls when the workflow will run
@@ -18,32 +17,59 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
+
+    # Define services required by the job, in this case, MySQL 5.7
+    services:
+      mysql:
+        image: mysql:5.7  # Use MySQL version 5.7 Docker image
+        env:
+          MYSQL_ROOT_PASSWORD: root  # Environment variable for MySQL root password
+          MYSQL_DATABASE: testdb  # Environment variable to create a default database
+        ports:
+          - 3306:3306  # Map port 3306 inside the container to port 3306 on the host
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5  # Docker options to ensure MySQL is healthy before proceeding
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-      
-      - name: Install MySQL 5.7
-        shell: bash
+
+      # Step to wait for MySQL to fully start before proceeding with subsequent steps
+      - name: Wait for MySQL
         run: |
-          brew install mysql
-          brew install mysql@5.7
-          brew unlink mysql && brew link mysql@5.7
-          echo 'export PATH="/usr/local/opt/mysql@5.7/bin:$PATH"' >> /Users/runner/.bash_profile
-          bash
+          while ! mysqladmin ping -h"127.0.0.1" --silent; do
+              sleep 1
+          done
+
+      # Step to install MySQL client on the GitHub Actions runner
+      - name: Install MySQL Client
+        run: |
+          sudo apt-get update
+          sudo apt-get install mysql-client -y
           mysql --version
           mysqldump --version
+
+      # Add a users table to provide some table structure
+      - name: Create table
+        run: |
+          mysql -h 127.0.0.1 -u root --password=root testdb -e "CREATE TABLE IF NOT EXISTS users (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255), email VARCHAR(255));"
+        env:
+          MYSQL_HOST: 127.0.0.1
+          MYSQL_PORT: 3306
+          MYSQL_ROOT_PASSWORD: root
+
       # Runs a single command using the runners shell
       - name: Check MySQL schemas
         uses: ./
-        with: 
+        with:
           file: db.sql
-          hostname: ${{ secrets.HOSTNAME }}
-          username: ${{ secrets.USERNAME }}
-          password: ${{ secrets.PASSWORD }}
-          database: ${{ secrets.DATABASE }}
+          hostname: '127.0.0.1'
+          username: 'root'
+          password: 'root'
+          database: testdb
+
+      # Uploads db.sql as an artifact of the workflow run
       - uses: actions/upload-artifact@v2
         with:
           name: db.sql
