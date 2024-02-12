@@ -70,7 +70,7 @@ jobs:
           database: testdb
 
       # Uploads db.sql as an artifact of the workflow run
-      - uses: actions/upload-artifact@4
+      - uses: actions/upload-artifact@v4
         with:
           name: db.sql
           path: ./db.sql
