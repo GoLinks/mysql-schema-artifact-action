@@ -55,10 +55,10 @@ jobs:
         uses: ./
         with:
           file: db.sql
-          hostname: ${{ secrets.HOSTNAME }}
-          username: ${{ secrets.USERNAME }}
-          password: ${{ secrets.PASSWORD }}
-          database: ${{ secrets.DATABASE }}
+          hostname: '127.0.0.1'
+          username: 'root'
+          password: 'root'
+          database: testdb
 
       # Uploads db.sql as an artifact of the workflow run
       - uses: actions/upload-artifact@v2
