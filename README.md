@@ -42,7 +42,7 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
 
-      - name: Install MySQL 5.7
+      - name: Install MySQL
         shell: bash
         run: |
           sudo apt-get update
@@ -50,15 +50,17 @@ jobs:
           sudo systemctl start mysql.service
           mysql --version
           mysqldump --version
+
       # Runs a single command using the runners shell
       - name: Check MySQL schemas
-        uses: ./
+        uses: GoLinks/mysql-schema-artifact@v1
         with:
           file: db.sql
           hostname: ${{ secrets.HOSTNAME }}
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
           database: ${{ secrets.DATABASE }}
+
       - uses: actions/upload-artifact@v2
         with:
           name: db.sql
