@@ -50,6 +50,15 @@ jobs:
           mysql --version
           mysqldump --version
 
+      # Add a users table to provide some table structure
+      - name: Create table
+        run: |
+          mysql -h 127.0.0.1 -u root --password=root testdb -e "CREATE TABLE IF NOT EXISTS users (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255), email VARCHAR(255));"
+        env:
+          MYSQL_HOST: 127.0.0.1
+          MYSQL_PORT: 3306
+          MYSQL_ROOT_PASSWORD: root
+
       # Runs a single command using the runners shell
       - name: Check MySQL schemas
         uses: ./
