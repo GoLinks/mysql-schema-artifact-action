@@ -1,5 +1,5 @@
 # This is a basic workflow to help you get started with Actions
-name: Check Databases
+name: Check MySQL 8.0
 
 # Controls when the workflow will run
 on:
@@ -35,15 +35,15 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
 
-      # Step to wait for MySQL to fully start before proceeding with subsequent steps
-      - name: Wait for MySQL
+      # Step to wait for MySQL 8.0 to fully start before proceeding with subsequent steps
+      - name: Wait for MySQL 8.0
         run: |
           while ! mysqladmin ping -h"127.0.0.1" --silent; do
               sleep 1
           done
 
       # Step to install MySQL client on the GitHub Actions runner
-      - name: Install MySQL Client
+      - name: Install MySQL Client Latest
         run: |
           sudo apt-get update
           sudo apt-get install mysql-client -y
@@ -60,7 +60,7 @@ jobs:
           MYSQL_ROOT_PASSWORD: root
 
       # Runs a single command using the runners shell
-      - name: Check MySQL schemas
+      - name: Check MySQL 8.0 schemas
         uses: ./
         with:
           file: db.sql
@@ -70,7 +70,7 @@ jobs:
           database: testdb
 
       # Uploads db.sql as an artifact of the workflow run
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@4
         with:
           name: db.sql
           path: ./db.sql
