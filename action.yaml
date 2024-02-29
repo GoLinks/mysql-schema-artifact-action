@@ -34,7 +34,7 @@ runs:
         pwd=${{ inputs.password }};
         db=${{ inputs.database }};
         echo "Connecting to DB"
-        mysqldump --defaults-extra-file=<(printf '[client]\nuser = %s\npassword = %s\nhost = %s' $user $pwd $host) -d --skip-add-drop-table --skip-add-drop-database --single-transaction $db | sed -e 's/AUTO_INCREMENT=[[:digit:]]* //' | sed -e 's/Host: .*  //' | sed -e 's/-- Dump completed on .*//' > ${{ inputs.file }}
+        mysqldump --defaults-extra-file=<(printf '[client]\nuser = %s\npassword = %s\nhost = %s' $user $pwd $host) -d --skip-add-drop-table --skip-add-drop-database $db | sed -e 's/AUTO_INCREMENT=[[:digit:]]* //' | sed -e 's/Host: .*  //' | sed -e 's/-- Dump completed on .*//' > ${{ inputs.file }}
         if [[ $? -ne 0 ]]; then
             echo >&2 "SQL error"
             exit 1
